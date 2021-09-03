@@ -14,7 +14,7 @@ def post_method(url, data):
 class TelegramBot:
     def __init__(self, token):
         self.url = {
-            'url': 'https://api.telegram.org/bot{}'.format(token),
+            'url': 'https://api.telegram.org/bot{}/'.format(token),
             'lock': Lock()
         }
 
@@ -22,6 +22,7 @@ class TelegramBot:
         self.url['lock'].acquire()
         res = get_method(self.url['url']+"getUpdates")
         self.url['lock'].release()
+        return res
 
     def delete_update(self, data):
         id = data['update_id'] + 1
@@ -31,6 +32,7 @@ class TelegramBot:
         self.url['lock'].acquire()
         res = post_method(self.url['url']+"getUpdates", data)
         self.url['lock'].release()
+        return res
 
     def send_message(self, data, msg):
         id = data['message']['chat']['id']
@@ -41,6 +43,7 @@ class TelegramBot:
         self.url['lock'].acquire()
         res = post_method(self.url['url']+"sendMessage", data_)
         self.url['lock'].release()
+        return res
 
     def get_file(self, data):
         file_id = data['message']['document']['file_id']
@@ -49,11 +52,14 @@ class TelegramBot:
         self.url['lock'].acquire()
         res = get_method(self.url['url']+f'{json_}').content
         self.url['lock'].release()
+        return res
 
 
 if __name__ == '__main__':
     token = os.environ.get("TOKEN")
     telegram = TelegramBot(token)
+    # print(res)
+
     while True:
         while True:
             try:
@@ -77,4 +83,4 @@ if __name__ == '__main__':
                         print(data['message']['text'])
                 else:
                     print(data)
-            sleep(0.5)
+            sleep(1)
